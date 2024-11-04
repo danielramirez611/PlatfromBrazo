@@ -1,0 +1,73 @@
+/* CustomCalendar.module.css */
+
+.rbc-calendar {
+    -webkit-box-shadow: 0 10px 50px -20px rgba(19, 31, 51, 0.65);
+    box-shadow: 0 10px 50px -20px rgba(19, 31, 51, 0.65);
+    border: 2px solid #222831;
+    color: #eee;
+  }
+  
+  .rbc-toolbar {
+    background: #222831;
+    border-bottom: 2px solid #222831;
+    -webkit-box-shadow: 0 0 18px -3px rgba(0, 0, 0, 0.65);
+    box-shadow: 0 0 18px -3px rgba(0, 0, 0, 0.65);
+    color: #eee;
+  }
+  
+  .rbc-toolbar button {
+    color: #00adb5;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+  
+  .rbc-toolbar button:hover {
+    color: #12cbd4;
+  }
+  
+  .rbc-event {
+    background-color: #00adb5;
+    color: #fff;
+    border-radius: 0;
+  }
+  
+  .rbc-event:hover {
+    background-color: #5d6979;
+  }
+  
+  .rbc-today {
+    background-color: #00adb5;
+    color: #fff;
+  }
+  
+  .rbc-off-range-bg {
+    background-color: #393e46;
+    color: #fff;
+  }
+  
+  .rbc-month-view, .rbc-time-view, .rbc-agenda-view {
+    background-color: #192435;
+  }
+  
+  .rbc-time-header, .rbc-day-bg {
+    border-color: #222831;
+  }
+  
+  .rbc-show-more {
+    background-color: #00adb5;
+    color: #fff;
+  }
+  
+  .rbc-day-bg:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+  }
+  
+  .rbc-current-time-indicator {
+    background-color: #00adb5;
+  }
+  
+  .rbc-today .rbc-current-time-indicator {
+    background-color: #027e84;
+  }
+  

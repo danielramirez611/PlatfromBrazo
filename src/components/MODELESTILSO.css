@@ -1,0 +1,32 @@
+/* Archivo styles.css */
+
+/* Estilo para pantallas grandes (tabletas y computadoras) */
+.iframe-container {
+    width: 93.7%;
+    height: 100%;
+    margin-left: 116.3%;
+}
+
+/* Estilo para pantallas pequeñas (celulares) */
+@media (max-width: 768px) {
+    .iframe-container {
+        width: 100%;
+        margin-left: 19%;
+    }
+}
+.hidden-scrollbar {
+    overflow: hidden; /* Oculta la barra de desplazamiento pero permite el scroll */
+}
+
+.hidden-scrollbar:hover {
+    overflow: auto; /* Muestra la barra de desplazamiento solo al hacer hover */
+}
+
+.hidden-scrollbar::-webkit-scrollbar {
+    width: 0px; /* Oculta la barra de desplazamiento en navegadores WebKit */
+}
+
+.hidden-scrollbar {
+    -ms-overflow-style: none;  /* IE y Edge */
+    scrollbar-width: none;  /* Firefox */
+}

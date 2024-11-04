@@ -1,0 +1,9 @@
+
+  /* Sin margen en pantallas pequeñas */
+  @media (max-width: 768px) {
+    .container {
+      margin-left: 0;
+      margin-right: 0;
+    }
+  }
+  

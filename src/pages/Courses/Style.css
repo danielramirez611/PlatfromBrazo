@@ -1,0 +1,56 @@
+/* styles.css */
+
+/* Estilos para pantallas grandes */
+@media (min-width: 1200px) {
+    .pp {
+        margin-left: 75px;
+        margin-top: -40px !important;
+    }
+}
+@media (min-width: 1200px) {
+    .vv {
+        margin-top: -20px !important;
+    }
+}
+@media only screen and (max-width: 834px) {
+    /* Estilos para pantallas con un ancho máximo de 600px */
+    .vv{
+        margin-top: 30px;
+    }
+    .Intro{
+        align-items: center!important;
+    }
+    
+}
+
+@media only screen and (min-width: 835px) and (max-width: 1280px) {
+    .vv{
+        margin-top: 50px;
+    }
+    .detalleCurso{
+    }
+    .Intro{
+        max-width: 423px!important;
+        
+    }
+}
+
+@media only screen and (min-width: 1281px) {
+    /* Estilos para pantallas con un ancho mínimo de 1201px */
+    .detalleCurso{
+        margin-left: -40px!important;
+    }
+    .Intro{
+        margin-left: auto!important;
+        
+        margin-right: auto!important;
+    }
+}
+@media only screen and (max-width: 600px) {
+    .detalleCurso {
+        display: block;
+        width: 100%;
+        /* Asegúrate de que otros estilos también se ajusten para pantallas pequeñas */
+    }
+}
+

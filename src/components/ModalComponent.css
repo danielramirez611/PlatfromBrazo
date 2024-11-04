@@ -1,0 +1,61 @@
+.video-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.slick-prev, .slick-next {
+    z-index: 1;
+    top: 45%; /* Ajusta este valor para centrar verticalmente */
+    transform: translateY(-50%); /* Esto centrará verticalmente el botón */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000000; /* Fondo negro */
+    transition: none; /* Elimina cualquier animación de transición */
+}
+
+.slick-prev:before, .slick-next:before {
+    font-size: 30px;
+    color: #ffffff; /* Flechas en color blanco */
+    transition: none; /* Elimina cualquier animación de transición */
+}
+
+/* Asegúrate de que el fondo negro y la flecha blanca se mantengan al interactuar */
+.slick-prev:hover, .slick-next:hover, 
+.slick-prev:focus, .slick-next:focus, 
+.slick-prev:active, .slick-next:active {
+    background-color: #000000; /* Mantén el fondo negro */
+    color: #ffffff; /* Mantén la flecha blanca */
+    opacity: 1; /* Evita que se vuelva transparente */
+    transition: none; /* Elimina cualquier animación de transición */
+}
+
+.slick-prev {
+    left: 24px;
+}
+
+.slick-next {
+    right: 24px;
+}
+
+.video-slide video {
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+    max-height: 80vh;
+    max-width: 100%;
+    border-radius: 8px;
+}
+
+/* Eliminación de barras de desplazamiento en el modal */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* Opcional: color de fondo de la barra */
+}
+
+::-webkit-scrollbar-thumb {
+    background: transparent;
+}

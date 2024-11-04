@@ -1,0 +1,425 @@
+import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
+
+// Definir tiempos de caché (en milisegundos)
+const CACHE_EXPIRATION_TIME = 5 * 60 * 1000; // 5 minutos
+
+let apiUrlsWithPort = [];
+let apiUrlsWithoutPort = [];
+let ipsVerData = [];
+
+// Utilidad para guardar en caché
+const setCache = (key, data) => {
+  const expirationTime = Date.now() + CACHE_EXPIRATION_TIME;
+  localStorage.setItem(key, JSON.stringify({ data, expirationTime }));
+};
+
+// Utilidad para obtener de caché
+const getCache = (key) => {
+  const cached = JSON.parse(localStorage.getItem(key));
+  if (cached && cached.expirationTime > Date.now()) {
+    return cached.data;
+  }
+  localStorage.removeItem(key); // Eliminar si está expirado
+  return null;
+};
+
+// Comprimir y usar caché para IPs de /ips-ver
+export const fetchIpsVer = async () => {
+  const cacheKey = 'ipsVerData';
+  const cachedIps = getCache(cacheKey);
+  if (cachedIps) {
+    ipsVerData = cachedIps;
+    return;
+  }
+
+  if (ipsVerData.length === 0) {
+    try {
+      const response = await axios.get('/ips-ver', { headers: { 'Accept-Encoding': 'gzip' } });
+      console.log('Received IPs from /ips-ver:', response.data);
+
+      if (response.data && Array.isArray(response.data.ips)) {
+        ipsVerData = response.data.ips.map(ip => ({
+          baseAddress: ip.address,
+          fullAddress: `${ip.address}:5000/ips-ver`,
+          networkName: ip.networkName,
+          isCurrent: ip.isCurrent,
+          deviceName: ip.isRaspberryPi ? 'Raspberry Pi' : 'Otro dispositivo'
+        }));
+        setCache(cacheKey, ipsVerData); // Guardar en caché
+      } else {
+        console.error('Invalid IPs response:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching IPs from /ips-ver:', error);
+    }
+  }
+};
+
+export const getIpsVerData = () => ipsVerData;
+
+export const fetchApiUrls = async () => {
+  const cacheKey = 'apiUrls';
+  const cachedUrls = getCache(cacheKey);
+  if (cachedUrls) {
+    apiUrlsWithPort = cachedUrls.withPort;
+    apiUrlsWithoutPort = cachedUrls.withoutPort;
+    return;
+  }
+
+  if (apiUrlsWithPort.length === 0 && apiUrlsWithoutPort.length === 0) {
+    try {
+      const response = await axios.get('/my-ips', { headers: { 'Accept-Encoding': 'gzip' } });
+      console.log('Received IPs response:', response.data);
+
+      if (response.data && Array.isArray(response.data.ips)) {
+        apiUrlsWithPort = response.data.ips.map(ip => `http://${ip}:5000`);
+        apiUrlsWithoutPort = response.data.ips.map(ip => `http://${ip}`);
+        setCache(cacheKey, { withPort: apiUrlsWithPort, withoutPort: apiUrlsWithoutPort }); // Guardar en caché
+      } else {
+        console.error('Invalid IPs response:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching IPs:', error);
+    }
+  }
+};
+
+export const getApiUrlsWithPort = () => apiUrlsWithPort;
+
+export const getApiUrlsWithoutPort = () => apiUrlsWithoutPort;
+
+const makeRequest = async (method, endpoint, data = null, params = null, usePort = true) => {
+  if (apiUrlsWithPort.length === 0 && apiUrlsWithoutPort.length === 0) {
+    await fetchApiUrls();
+  }
+
+  const urls = usePort ? apiUrlsWithPort : apiUrlsWithoutPort;
+
+  for (let url of urls) {
+    try {
+      const response = await axios({
+        method,
+        url: `${url}${endpoint}`,
+        data,
+        params,
+        headers: { 'Accept-Encoding': 'gzip' } // Solicitar compresión
+      });
+      if (response.data) {
+        return response.data;
+      }
+    } catch (error) {
+      console.error(`Error with API request to ${url}:`, error);
+    }
+  }
+
+  throw new Error('All API requests failed.');
+};
+
+// Funciones de usuario
+export const registerUser = (userData) => makeRequest('post', '/register', userData);
+export const loginUser = (userData) => makeRequest('post', '/login', userData);
+export const getUsers = () => makeRequest('get', '/users');
+export const deleteUser = (userId) => makeRequest('delete', `/deletes/${userId}`);
+export const updateUser = (userId, userData) => makeRequest('put', `/users/${userId}`, userData);
+
+// Funciones relacionadas con cursos
+export const addCourse = (courseData) => makeRequest('post', '/cursos', { ...courseData, requestId: uuidv4() });
+export const getCourses = () => makeRequest('get', '/cursos');
+export const deleteCourse = (courseId) => makeRequest('delete', `/cursos/${courseId}`);
+export const updateCourse = (courseId, courseData) => makeRequest('put', `/cursos/${courseId}`, courseData);
+
+// Funciones relacionadas con contenido de cursos
+export const addCourseContent = (courseId, contentData) => makeRequest('post', `/cursos/${courseId}/contenido`, contentData);
+export const getCourseContent = (courseId, role) => makeRequest('get', `/cursos/${courseId}/contenido`, null, { role });
+
+// Funciones relacionadas con semanas y archivos
+export const getCourseWeeks = (courseId) => makeRequest('get', `/cursos/${courseId}/semanas`);
+export const addCourseWeek = (courseId, weekData) => makeRequest('post', `/cursos/${courseId}/semanas`, weekData);
+export const updateWeek = (weekId, weekData) => makeRequest('put', `/semanas/${weekId}`, weekData);
+export const deleteWeek = (weekId) => makeRequest('delete', `/semanas/${weekId}`);
+export const getWeekFiles = (weekId) => makeRequest('get', `/semanas/${weekId}/archivos`);
+export const addWeekFile = (weekId, fileData) => makeRequest('post', `/semanas/${weekId}/archivos`, fileData);
+export const deleteFile = (fileId) => makeRequest('delete', `/archivos/${fileId}`);
+
+// Funciones relacionadas con entrega de archivos
+export const submitFile = (fileData) => makeRequest('post', '/entrega_archivos', fileData);
+export const getEntregaArchivos = () => makeRequest('get', '/entrega_archivos');
+export const deleteEntregaArchivo = (entregaId) => makeRequest('delete', `/entrega_archivos/${entregaId}`);
+export const updateEntregaArchivo = (entregaId, entregaData) => makeRequest('put', `/entrega_archivos/${entregaId}`, entregaData);
+export const getUserEntregas = (userId) => makeRequest('get', `/entrega_archivos/usuario/${userId}`);
+
+// Funciones relacionadas con notas
+export const fetchNotes = (dateStr) => makeRequest('get', `/api/notes/${dateStr}`);
+export const saveNote = (noteData) => makeRequest('post', '/api/notes', noteData);
+export const fetchAllNotes = () => makeRequest('get', '/api/notes');
+export const deleteNote = (id) => makeRequest('delete', `/api/notes/${id}`);
+
+// Funciones para habilitar semanas y entregas
+export const toggleWeekStatus = (weekId, isEnabled) => makeRequest('put', `/semanas/${weekId}/enable`, { is_enabled: isEnabled });
+export const toggleEntregaStatus = (isEnabled, startDate, endDate) => makeRequest('post', '/entrega-status', { isEnabled, startDate, endDate });
+export const getEntregaStatus = () => makeRequest('get', '/entrega-status');
+
+// Funciones para archivos zip
+export const uploadZipFile = (fileData) => makeRequest('post', '/api/arduino-files', fileData);
+export const fetchZipFiles = () => makeRequest('get', '/api/arduino-files');
+export const arduinoDelete = (fileId) => makeRequest('delete', `/api/arduino-files/${fileId}`);
+
+// Funciones para códigos de Arduino
+export const addArduinoCode = (codeData) => makeRequest('post', '/api/arduino-codes', codeData);
+export const fetchArduinoCodes = () => makeRequest('get', '/api/arduino-codes');
+export const deleteArduinoCode = (codeId) => makeRequest('delete', `/api/arduino-codes/${codeId}`);
+export const updateArduinoCode = (codeId, updatedCodeData) => makeRequest('put', `/api/arduino-codes/${codeId}`, updatedCodeData);
+
+
+PARTTE2 O V2
+
+
+
+import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
+
+let apiUrlsWithPort = [];
+let apiUrlsWithoutPort = [];
+let ipsVerData = [];
+
+export const fetchIpsVer = async () => {
+  if (ipsVerData.length === 0) {
+    try {
+      const response = await axios.get('/ips-ver');
+      console.log('Received IPs from /ips-ver:', response.data);
+
+      if (response.data && Array.isArray(response.data.ips)) {
+        ipsVerData = response.data.ips.map(ip => ({
+          baseAddress: ip.address,
+          fullAddress: `${ip.address}:5000/ips-ver`,
+          networkName: ip.networkName,
+          isCurrent: ip.isCurrent,
+          deviceName: ip.isRaspberryPi ? 'Raspberry Pi' : 'Otro dispositivo'
+        }));
+      } else {
+        console.error('Invalid IPs response:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching IPs from /ips-ver:', error);
+    }
+  }
+};
+
+export const getIpsVerData = () => {
+  return ipsVerData;
+};
+
+export const fetchApiUrls = async () => {
+  if (apiUrlsWithPort.length === 0 && apiUrlsWithoutPort.length === 0) {
+    try {
+      const response = await axios.get('/my-ips');
+      console.log('Received IPs response:', response.data);
+
+      if (response.data && Array.isArray(response.data.ips)) {
+        apiUrlsWithPort = response.data.ips.map(ip => `http://${ip}:5000`);
+        apiUrlsWithoutPort = response.data.ips.map(ip => `http://${ip}`);
+      } else {
+        console.error('Invalid IPs response:', response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching IPs:', error);
+    }
+  }
+};
+
+export const getApiUrlsWithPort = () => {
+  return apiUrlsWithPort;
+};
+
+export const getApiUrlsWithoutPort = () => {
+  return apiUrlsWithoutPort;
+};
+
+const makeRequest = async (method, endpoint, data = null, params = null, usePort = true) => {
+  if (apiUrlsWithPort.length === 0 && apiUrlsWithoutPort.length === 0) {
+    await fetchApiUrls();
+  }
+
+  const urls = usePort ? apiUrlsWithPort : apiUrlsWithoutPort;
+
+  for (let url of urls) {
+    try {
+      const response = await axios({ method, url: `${url}${endpoint}`, data, params });
+      if (response.data) {
+        return response.data;
+      }
+    } catch (error) {
+      console.error(`Error with API request to ${url}:`, error);
+    }
+  }
+
+  throw new Error('All API requests failed.');
+};
+
+export const addCourse = async (courseData) => {
+  const requestId = uuidv4();
+  return makeRequest('post', '/cursos', { ...courseData, requestId });
+};
+
+
+export const registerUser = async (userData) => {
+  return makeRequest('post', '/register', userData);
+};
+
+export const loginUser = async (userData) => {
+  return makeRequest('post', '/login', userData);
+};
+
+export const getUsers = async () => {
+  return makeRequest('get', '/users');
+};
+
+export const deleteUser = async (userId) => {
+  return makeRequest('delete', `/deletes/${userId}`);
+};
+
+export const updateUser = async (userId, userData) => {
+  return makeRequest('put', `/users/${userId}`, userData);
+};
+
+// Funciones relacionadas con cursos
+
+export const getCourses = async () => {
+  return makeRequest('get', '/cursos');
+};
+
+
+
+export const deleteCourse = async (courseId) => {
+  return makeRequest('delete', `/cursos/${courseId}`);
+};
+
+export const updateCourse = async (courseId, courseData) => {
+  return makeRequest('put', `/cursos/${courseId}`, courseData);
+};
+
+// Funciones relacionadas con contenido de cursos
+
+export const addCourseContent = async (courseId, contentData) => {
+  return makeRequest('post', `/cursos/${courseId}/contenido`, contentData);
+};
+
+export const getCourseContent = async (courseId, role) => {
+  return makeRequest('get', `/cursos/${courseId}/contenido`, null, { role });
+};
+
+// Funciones relacionadas con semanas y archivos
+
+export const getCourseWeeks = async (courseId) => {
+  return makeRequest('get', `/cursos/${courseId}/semanas`);
+};
+
+export const getWeekFiles = async (weekId) => {
+  return makeRequest('get', `/semanas/${weekId}/archivos`);
+};
+
+export const addCourseWeek = async (courseId, weekData) => {
+  return makeRequest('post', `/cursos/${courseId}/semanas`, weekData);
+};
+
+export const addWeekFile = async (weekId, fileData) => {
+  return makeRequest('post', `/semanas/${weekId}/archivos`, fileData);
+};
+
+export const deleteWeek = async (weekId) => {
+  return makeRequest('delete', `/semanas/${weekId}`);
+};
+
+export const deleteFile = async (fileId) => {
+  return makeRequest('delete', `/archivos/${fileId}`);
+};
+
+export const updateWeek = async (weekId, weekData) => {
+  return makeRequest('put', `/semanas/${weekId}`, weekData);
+};
+
+// Funciones relacionadas con entrega de archivos
+
+export const submitFile = async (fileData) => {
+  return makeRequest('post', '/entrega_archivos', fileData);
+};
+
+export const getEntregaArchivos = async () => {
+  return makeRequest('get', '/entrega_archivos');
+};
+
+export const deleteEntregaArchivo = async (entregaId) => {
+  return makeRequest('delete', `/entrega_archivos/${entregaId}`);
+};
+
+export const updateEntregaArchivo = async (entregaId, entregaData) => {
+  return makeRequest('put', `/entrega_archivos/${entregaId}`, entregaData);
+};
+
+export const getUserEntregas = async (userId) => {
+  return makeRequest('get', `/entrega_archivos/usuario/${userId}`);
+};
+
+// Funciones relacionadas con notas
+
+export const fetchNotes = async (dateStr) => {
+  return makeRequest('get', `/api/notes/${dateStr}`);
+};
+
+export const saveNote = async (noteData) => {
+  return makeRequest('post', '/api/notes', noteData);
+};
+
+export const fetchAllNotes = async () => {
+  return makeRequest('get', '/api/notes');
+};
+
+export const deleteNote = async (id) => {
+  return makeRequest('delete', `/api/notes/${id}`);
+};
+
+
+export const toggleWeekStatus = async (weekId, isEnabled) => {
+  return makeRequest('put', `/semanas/${weekId}/enable`, { is_enabled: isEnabled });
+};
+
+export const toggleEntregaStatus = async (isEnabled, startDate, endDate) => {
+  return makeRequest('post', '/entrega-status', { isEnabled, startDate, endDate });
+};
+
+export const getEntregaStatus = async () => {
+  return makeRequest('get', '/entrega-status');
+};
+
+
+export const uploadZipFile = async (fileData) => {
+  return makeRequest('post', '/api/arduino-files', fileData);
+};
+export const fetchZipFiles = async () => {
+  return makeRequest('get', '/api/arduino-files');
+};
+
+export const arduinoDelete = async (fileId) => {
+  return makeRequest('delete', `/api/arduino-files/${fileId}`);
+};
+
+
+// Función para agregar un código de Arduino
+export const addArduinoCode = async (codeData) => {
+  return makeRequest('post', '/api/arduino-codes', codeData);
+};
+
+// Función para obtener todos los códigos de Arduino
+export const fetchArduinoCodes = async () => {
+  return makeRequest('get', '/api/arduino-codes');
+};
+
+// Función para eliminar un código de Arduino
+export const deleteArduinoCode = async (codeId) => {
+  return makeRequest('delete', `/api/arduino-codes/${codeId}`);
+};
+// Función para actualizar un código de Arduino
+export const updateArduinoCode = async (codeId, updatedCodeData) => {
+  return makeRequest('put', `/api/arduino-codes/${codeId}`, updatedCodeData);
+};
