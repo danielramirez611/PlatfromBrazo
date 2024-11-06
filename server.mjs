@@ -32,8 +32,8 @@ app.use(express.static(path.join(__dirname, 'dist')));
 const dbConfig = {
   connectionLimit: 50,
   host: '127.0.0.1',
-  user: 'root',
-  password: 'root',
+  user: 'daniel',
+  password: 'adaniel',
   database: 'imayine_db',
   acquireTimeout: 10000,
   connectTimeout: 10000,

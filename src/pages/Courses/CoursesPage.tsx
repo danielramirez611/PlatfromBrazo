@@ -25,11 +25,9 @@ interface Course {
     image: string;
 }
 
-interface Props {
-    addToCart: (course: Course) => void;
-}
 
-const CoursesPage: React.FC<Props> = ({ addToCart }) => {
+
+const CoursesPage: React.FC<Props> = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [courses, setCourses] = useState<Course[]>([]);
     const [openModal, setOpenModal] = useState<boolean>(false);
@@ -223,7 +221,7 @@ const CoursesPage: React.FC<Props> = ({ addToCart }) => {
         {loading ? (
             <LoadingSpinner />
         ) : (
-            <Grid sx={{marginLeft: {lg: '130px', md:'50px' },marginRight: {lg: '10px' }, marginTop: {xs: '74px',sm: '85px',md: '45px',lg: '10px'},}}>
+            <Grid sx={{marginLeft: {lg: '130px', md:'50px' },marginRight: {lg: '10px' }, marginTop: {xs: '74px',sm: '85px',md: '45px',lg: '10px'},height:'100vh', width:'100wh'}}>
             <Grid 
                 sx={{ 
                     display:'flex',

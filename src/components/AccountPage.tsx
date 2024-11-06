@@ -66,11 +66,7 @@ const AccountPage: React.FC = () => {
               mb: 2,
             }}
           >
-            <img
-              src="https://via.placeholder.com/600x200" // Reemplaza esta URL con la URL de tu imagen
-              alt="Imagen de bienvenida"
-              style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
-            />
+            
           </Box>
         </Box>
       </Container>

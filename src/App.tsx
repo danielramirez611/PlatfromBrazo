@@ -29,7 +29,7 @@ const App: React.FC = () => {
   return (
     <AuthProvider>
       <Router>
-        <div className="App" style={{ display: 'flex', minHeight: '100vh' }}>
+        <div className="App" style={{ minHeight: '100vh' }}>
           <ResponsiveAppBar />
           <Header
             handleLogout={() => {
