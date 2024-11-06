@@ -19,8 +19,8 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 
 import librosIcon from './../../public/img/libros.png';
 import casaIcon from './../../public/img/calendario.png';
-import logo from './../../public/img/icontecsup.png';
-import imayiner from './../../public/img/icontecsup.png';
+import logo from './../../public/img/continental.png';
+import imayiner from './../../public/img/logo.png';
 import aspireIcon from './../../public/img/user.png';
 import entrarIcon from './../../public/img/entrar.png';
 import arduino from './../../public/img/tecnologia.png';
@@ -124,7 +124,7 @@ const ResponsiveAppBar: React.FC = () => {
           <img
             src={logo}
             alt="Logo"
-            style={{ width: '95px', height: '75px', margin: '0 auto' }}
+            style={{ width: '75px', height: '75px', margin: '0 auto' }}
           />
         </ListItem>
         {isAuthenticated && pages.map((page) => (
@@ -242,7 +242,7 @@ const ResponsiveAppBar: React.FC = () => {
           <img
             src={imayiner}
             alt="Logo"
-            style={{ width: '37px', height: '50px', marginRight: '8px' }}
+            style={{ width: '50px', height: '50px', marginRight: '8px' }}
           />
           <Typography
             variant="caption"
@@ -329,7 +329,7 @@ const ResponsiveAppBar: React.FC = () => {
               <img
                 src={logo}
                 alt="Logo"
-                style={{ width: '85px', height: '85px' }}
+                style={{ width: '120px', height: '60px' }}
               />
             </Box>
             {isAuthenticated && (

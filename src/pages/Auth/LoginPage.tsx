@@ -102,8 +102,8 @@ const LoginPage: React.FC = () => {
               },
             }}
           >
-            Bienvenidos a <br />
-            Tecsup
+            Bienvenidos a la <br />
+            Universidad Continental
           </Typography>
         </Grid>
         <Grid 
@@ -132,7 +132,7 @@ const LoginPage: React.FC = () => {
             }}
           >
             <img 
-              src="/img/tecsup.png" 
+              src="/img/unicontinental.png" 
               alt="icon" 
               style={{ 
                 marginRight: '1rem', 
