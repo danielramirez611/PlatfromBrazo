@@ -431,10 +431,10 @@ const RegisterPage = () => {
                         },
                       }}
                     >
-                      Ver librerias de Arduino
+                      Ver codigos de Arduino
                     </Button>         
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                   {/*<Grid item xs={12} sm={6}>
                     <Button
                       onClick={() => navigate('/entregas-tablet')}
                       fullWidth
@@ -457,7 +457,7 @@ const RegisterPage = () => {
                     >
                       Ver Entregas de Archivos
                     </Button>         
-                  </Grid>
+                    </Grid>*/}
                   
                 </Grid>
               </form>

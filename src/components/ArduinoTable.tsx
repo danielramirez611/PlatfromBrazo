@@ -122,6 +122,7 @@ const ArduinoTable: React.FC = () => {
   return (
     <Grid container component="main" sx={{ height: '100vh', backgroundColor: '#0D1A2E', color: 'white' }}>
       <Grid item xs={12} component={Paper} elevation={6} square sx={{ padding: { lg: '2rem', xs: '1rem' }, backgroundColor: '#0D1A2E', color: 'white', borderRadius: '10px' }}>
+        {/*
         <Typography
           component="h2"
           variant="h6"
@@ -222,7 +223,7 @@ const ArduinoTable: React.FC = () => {
             </tbody>
           </table>
         </Box>
-
+*/}
         <Typography
           component="h2"
           variant="h6"

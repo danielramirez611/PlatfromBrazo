@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchApiUrls, getApiUrlsWithDynamicPort, requestPort, releasePort, fetchArduinoCodes } from '../api';
 import { Grid, CircularProgress, Typography, FormControl, InputLabel, Select, MenuItem, Button } from '@mui/material';
 import { useAuth } from '../pages/Auth/AuthContext';
+import ArduinoFileTable from './ArduinoFileTable';
 
 const fetchWithTimeout = (url: string, options: RequestInit = {}, timeout = 2000) => {
     return Promise.race([
@@ -282,6 +283,11 @@ const ArduinoLab: React.FC = () => {
 
                         </div>
                     </Grid>
+                    {/*<Grid container sx={{ width: '100%', height: '100vh', overflow: 'auto', color: 'white', justifyContent: 'center' }} spacing={2}>
+      <Grid item xs={12} md={6}>
+        <ArduinoFileTable />
+      </Grid>
+    </Grid>*/}
                 </Grid>
             </Grid>
         </Grid>

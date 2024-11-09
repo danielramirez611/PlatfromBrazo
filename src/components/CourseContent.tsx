@@ -42,7 +42,6 @@ const CourseContent: React.FC<CourseContentProps> = ({ courseContents, userRole 
   const [courseState, setCourseState] = useState<Semana[]>(courseContents);
 
   useEffect(() => {
-    // Sync courseState with the initial courseContents prop
     setCourseState(courseContents);
   }, [courseContents]);
 
@@ -129,10 +128,9 @@ const CourseContent: React.FC<CourseContentProps> = ({ courseContents, userRole 
     }
   };
 
- const handleToggleWeekStatus = async (weekId: number, currentStatus: boolean) => {
+  const handleToggleWeekStatus = async (weekId: number, currentStatus: boolean) => {
     try {
       await toggleWeekStatus(weekId, !currentStatus);
-      // Update the state locally to reflect changes immediately
       setCourseState((prev) =>
         prev.map((week) =>
           week.id === weekId ? { ...week, is_enabled: !currentStatus } : week
@@ -143,6 +141,7 @@ const CourseContent: React.FC<CourseContentProps> = ({ courseContents, userRole 
       toast.error(`Error al ${currentStatus ? 'deshabilitar' : 'habilitar'} la semana.`);
     }
   };
+
   const handleDownloadFile = (fileName: string, fileContent: string) => {
     const link = document.createElement('a');
     link.href = `data:application/octet-stream;base64,${fileContent}`;
@@ -151,13 +150,20 @@ const CourseContent: React.FC<CourseContentProps> = ({ courseContents, userRole 
     link.click();
     document.body.removeChild(link);
   };
+
   return (
     <Box sx={{ mt: 4, width: '100%', mb: 6, height:'100%' }}>
       <Typography variant="h5" sx={{ mb: 2, color: 'white', fontSize: '1.5rem' }}>Contenido del curso</Typography>
-      {/* Button to navigate to /course-tablet */}
-      <Button variant="contained" color="primary" onClick={() => navigate('/course-tablet')} sx={{ mb: 3 }}>
-        Administrar Semanas
-      </Button>
+      {userRole === "admin" && (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate('/course-tablet')}
+          sx={{ mb: 3 }}
+        >
+          Administrar Semanas
+        </Button>
+      )}
       {courseContents.map((content) => (
         <Accordion key={content.id} sx={{ mb: 2 }}>
           <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />} sx={{ backgroundColor: '#E93845', color: 'white' }}>
@@ -204,7 +210,7 @@ const CourseContent: React.FC<CourseContentProps> = ({ courseContents, userRole 
       <Modal open={previewOpen} onClose={() => setPreviewOpen(false)}>
         <Box sx={{ ...modalStyle, width: '80%', height: '80%' }}>
           {previewFile?.fileName.endsWith('.pdf') ? (
-            <Worker workerUrl={`https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`}>
+            <Worker workerUrl="/pdf.worker.min.js">
               <Viewer fileUrl={`data:application/pdf;base64,${previewFile?.fileContent}`} />
             </Worker>
           ) : (
