@@ -190,12 +190,12 @@ const CoursesPage: React.FC<Props> = () => {
         let videos: string[] = [];
     
         if (user.role === 'admin') {
-            videos = ["/img/lab2.mp4"];
+            videos = ["/img/docente.mp4"];
         } else if (user.role === 'user') {
-            videos = ["/img/lab2.mp4"];
+            videos = ["/img/estudiante.mp4"];
         } 
     
-        videos.push("/img/video.mp4");
+        videos.push("/img/estudiante.mp4");
         setSelectedVideos(videos);
         setOpenModal(true);
     };
