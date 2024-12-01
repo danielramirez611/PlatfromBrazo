@@ -567,7 +567,7 @@ useEffect(() => {
                       )}
                     </div>
                     <Button onClick={handleAddNewCourseWithReset} sx={{ mt: 2, backgroundColor: 'black', color: 'white', '&:hover': { backgroundColor: 'black', opacity: 0.8 } }}>
-                      Agregar Curso
+                      Agregar Cursos
                     </Button>
                   </Paper>
                 </Grid>
@@ -833,7 +833,7 @@ useEffect(() => {
 
                   </Grid>
                   
- 
+ {/*
                   <Button
     onClick={() => setOpenModal(true)}
     sx={{
@@ -848,7 +848,7 @@ useEffect(() => {
     }}
 >
     Habilitar Entrega
-</Button>
+</Button> */}
 
 
         <Modal
