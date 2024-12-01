@@ -48,8 +48,13 @@ const CourseDetail: React.FC = () => {
           <CourseObjectivesModal open={objectivesOpen} onClose={() => setObjectivesOpen(false)} objectives={courseInfo?.objetivos_especificos || ''} />
         </Grid>
         <Grid item xs={12}>
-          <CourseContent courseContents={courseContents} userRole={user?.role || ''} />
-        </Grid>
+        <CourseContent 
+  courseContents={courseContents} 
+  userRole={user?.role || ''} 
+  courseId={id || ''} // Pasa el id del curso aquí
+/>
+</Grid>
+
       </Grid>
       <ToastContainer />
 
