@@ -27,6 +27,9 @@ import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import RestoreIcon from '@mui/icons-material/Restore';
+import EngineeringIcon from '@mui/icons-material/Engineering'; // Ícono para PDF/PPTX
+import DescriptionIcon from '@mui/icons-material/Description'; // Ícono para DOC/Word
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'; // Ícono para PDF
 
 interface Archivo {
   id: number;
@@ -66,7 +69,24 @@ const CourseContent: React.FC<CourseContentProps> = ({ courseContents, userRole,
   const [addFileModalOpen, setAddFileModalOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1); // Nivel de zoom inicial (1 = tamaño original)
+  const [filter, setFilter] = useState<string | null>(null); // Estado para el filtro de archivos
 
+  // Función para filtrar archivos según el tipo seleccionado
+  const getFilteredFiles = (files: Archivo[]) => {
+    if (!filter) return files; // Mostrar todos si no hay filtro
+    if (filter === 'pdf-pptx') {
+      return files.filter(
+        (file) => file.nombre_archivo.endsWith('.pdf') || file.nombre_archivo.endsWith('.pptx')
+      );
+    }
+    if (filter === 'doc') {
+      return files.filter(
+        (file) => file.nombre_archivo.endsWith('.doc') || file.nombre_archivo.endsWith('.docx')
+      );
+    }
+    return files;
+  };
+  
 // Función para alternar pantalla completa
 const handleFullscreenToggle = () => {
   const modalElement = document.getElementById('preview-modal');
@@ -380,8 +400,8 @@ const handleRestoreZoom = () => {
           </Box>
         )}
       </AccordionSummary>
-          <AccordionDetails sx={{ backgroundColor: '#FFFFFF', color: 'black' }}>
-            {userRole === 'admin' && (
+      <AccordionDetails sx={{ backgroundColor: '#f4f4f4', color: 'black' }}>
+      {userRole === 'admin' && (
               <Button 
               variant="outlined" 
               onClick={() => {
@@ -393,22 +413,50 @@ const handleRestoreZoom = () => {
               Agregar Archivo a Semana
             </Button>
             )}
-            {weekFiles[content.id]?.map((archivo) => (
+            {/* Barra de Íconos para Filtrar */}
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, mb: 2 }}>
+              <IconButton
+                onClick={() => setFilter(filter === 'pdf-pptx' ? null : 'pdf-pptx')}
+                sx={{ color: filter === 'pdf-pptx' ? 'primary.main' : 'black' }}
+              >
+                <PictureAsPdfIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => setFilter(filter === 'doc' ? null : 'doc')}
+                sx={{ color: filter === 'doc' ? 'primary.main' : 'black' }}
+              >
+                <DescriptionIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => setFilter(filter === 'mp4' ? null : 'mp4')}
+                sx={{ color: filter === 'mp4' ? 'primary.main' : 'black' }}
+              >
+                <EngineeringIcon />
+              </IconButton>
+            </Box>
+
+            {/* Lista de Archivos Filtrados */}
+            {getFilteredFiles(weekFiles[content.id] || []).map((archivo) => (
               <React.Fragment key={archivo.id}>
-                <Button
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Button
                     onClick={() => handlePreview(archivo.nombre_archivo, archivo.archivo)}
-                    sx={{ justifyContent: 'flex-start', flex: 1 }}
+                    sx={{ flex: 1, justifyContent: 'flex-start' }}
                   >
                     {archivo.nombre_archivo}
                   </Button>
-                  <IconButton onClick={() => handleDownloadFile(archivo.nombre_archivo, archivo.archivo)} sx={{ ml: 1 }}>
+                  <IconButton
+                    onClick={() => handleDownloadFile(archivo.nombre_archivo, archivo.archivo)}
+                    sx={{ ml: 1 }}
+                  >
                     <FileDownloadIcon />
                   </IconButton>
-                {userRole === 'admin' && (
-                  <Button onClick={() => handleDeleteFile(archivo.id, content.id)} sx={{ color: 'red' }}>
-                    Eliminar
-                  </Button>
-                )}
+                  {userRole === 'admin' && (
+                    <Button onClick={() => handleDeleteFile(archivo.id, content.id)} sx={{ color: 'red' }}>
+                      Eliminar
+                    </Button>
+                  )}
+                </Box>
                 <Divider sx={{ borderColor: 'black', my: 0.5 }} />
               </React.Fragment>
             ))}
