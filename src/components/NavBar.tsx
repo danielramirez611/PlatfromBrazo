@@ -23,7 +23,8 @@ import logo from './../../public/img/continental.png';
 import imayiner from './../../public/img/logo.png';
 import aspireIcon from './../../public/img/user.png';
 import entrarIcon from './../../public/img/entrar.png';
-import arduino from './../../public/img/tecnologia.png';
+import arduino from './../../public/img/brazo-robotico.png';
+import laboratorios from './../../public/img/tecnologia.png';
 
 const pages = ['Cursos', 'Calendario'];
 const adminPages = ['Mis usuarios'];
@@ -106,7 +107,7 @@ const ResponsiveAppBar: React.FC = () => {
       case 'Calendario':
         return 'Calendario';
       case 'Laboratorio Arduino':
-        return 'Laboratorio Arduino';
+        return 'Laboratorio Brazo Robotico';
       default:
         return '';
     }
@@ -124,7 +125,7 @@ const ResponsiveAppBar: React.FC = () => {
           <img
             src={logo}
             alt="Logo"
-            style={{ width: '75px', height: '75px', margin: '0 auto' }}
+            style={{ width: 'auto', height: '75px', margin: '0 auto' }}
           />
         </ListItem>
         {isAuthenticated && pages.map((page) => (
@@ -146,7 +147,7 @@ const ResponsiveAppBar: React.FC = () => {
             <ListItem button onClick={() => setOpenLabMenu(!openLabMenu)}>
               <ListItemIcon>
                 <img
-                  src={arduino}
+                  src={laboratorios}
                   alt="Laboratorios"
                   style={{ width: 24, height: 24 }}
                 />
@@ -303,7 +304,7 @@ const ResponsiveAppBar: React.FC = () => {
             <img
               src={logo}
               alt="Logo"
-              style={{ width: '95px', height: '75px', marginLeft: 'auto' }}
+              style={{ width: '95px', height: 'auto', marginLeft: 'auto' }}
             />
           </Box>
 
@@ -387,7 +388,7 @@ const ResponsiveAppBar: React.FC = () => {
                     }}
                   >
                     <img
-                      src={arduino}
+                      src={laboratorios}
                       alt="Laboratorios"
                       style={{ width: 24, height: 24 }}
                     />

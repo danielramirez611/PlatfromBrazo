@@ -1,5 +1,6 @@
 // CourseContent.tsx
 import React, { useState, useEffect } from 'react';
+import Grid from '@mui/material/Grid';
 import { Accordion, AccordionSummary, AccordionDetails, Typography, Box, Button, Divider, Modal, TextField, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -22,6 +23,7 @@ import habilitar from '../../public/img/habilitar.png';
 import desabilitar from '../../public/img/desabilitar.png';
 import { MenuItem, Select, InputLabel, FormControl } from '@mui/material';
 import editar from '../../public/img/editar.png';
+import basura from '../../public/img/bote-de-basura.png';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
@@ -91,28 +93,41 @@ const CourseContent: React.FC<CourseContentProps> = ({ courseContents, userRole,
 const handleFullscreenToggle = () => {
   const modalElement = document.getElementById('preview-modal');
   if (!isFullscreen && modalElement) {
-    modalElement.requestFullscreen();
-    setIsFullscreen(true);
+    modalElement.requestFullscreen().catch((err) => {
+      console.error('Error al activar pantalla completa:', err);
+    });
   } else if (isFullscreen && document.fullscreenElement) {
-    document.exitFullscreen();
-    setIsFullscreen(false);
+    document.exitFullscreen().catch((err) => {
+      console.error('Error al salir de pantalla completa:', err);
+    });
   }
 };
 
-// Función para aumentar el zoom
+const MIN_ZOOM = 0.1; // Zoom mínimo 10%
+const MAX_ZOOM = 3.0; // Zoom máximo 300%
+const ZOOM_STEP = 0.1; // Incremento de zoom
+
 const handleZoomIn = () => {
-  setZoomLevel((prevZoom) => Math.min(prevZoom + 0.2, 3)); // Máximo zoom: 3x
+  setZoomLevel((prev) => Math.min(prev + ZOOM_STEP, MAX_ZOOM)); // Aumenta hasta el máximo
 };
 
-// Función para reducir el zoom
 const handleZoomOut = () => {
-  setZoomLevel((prevZoom) => Math.max(prevZoom - 0.2, 0.5)); // Mínimo zoom: 0.5x
+  setZoomLevel((prev) => Math.max(prev - ZOOM_STEP, MIN_ZOOM)); // Reduce hasta el mínimo
 };
 
-// Función para restaurar el zoom
 const handleRestoreZoom = () => {
-  setZoomLevel(1); // Vuelve al tamaño original
+  setZoomLevel(1); // Restaurar al 100%
 };
+useEffect(() => {
+  const handleFullscreenChange = () => {
+    setIsFullscreen(!!document.fullscreenElement); // Actualiza el estado automáticamente
+  };
+
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+  return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+}, []);
+
+
 
     const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -325,80 +340,122 @@ const handleRestoreZoom = () => {
   };
 
   return (
-    <Box sx={{ mt: 4, width: '100%', mb: 6, height:'100%' }}>
-      <Typography variant="h5" sx={{ mb: 2, color: 'white', fontSize: '1.5rem' }}>Contenido del curso</Typography>
-      {userRole === "admin" && (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate('/course-tablet')}
-          sx={{ mb: 3 }}
-        >
-          Administrar Semanas
-        </Button>
-         
-      )}
-            {userRole === "admin" && (
+    <Box sx={{ mt: 4, width: '100%', mb: 6, height:'100%', padding:'15px' }}>
 
-       <Button variant="contained" onClick={() => setAddWeekModalOpen(true)} sx={{ mt: 2 }}>
-            Agregar semana del curso
+      <Typography variant="h5" sx={{ mb: 2, color: 'white', fontSize: '1.5rem' }}>Contenido del curso</Typography>
+      <Grid xs={12} lg={12} sx={{ display:'flex', justifyContent:'center', gap:2, marginBottom:'1rem',padding:{xs:'0% 8%',md:'0%'}}} >
+        {userRole === "admin" && (
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{
+              backgroundColor: '#1976d2',
+              color: '#fff',
+              '&:hover': { backgroundColor: '#115293' },
+              padding: '8px 16px',
+              fontSize: '14px',
+              textTransform: 'none',
+              borderRadius: '8px',
+            }}
+            onClick={() => navigate('/course-tablet')}
+          >
+            Administrar Semanas
+          </Button>  
+        )}
+        {userRole === "admin" && (
+          <Button 
+            variant="contained" 
+            onClick={() => setAddWeekModalOpen(true)}
+            sx={{
+              backgroundColor: '#9c27b0',
+              color: '#fff',
+              '&:hover': { backgroundColor: '#6a1b9a' },
+              padding: '8px 16px',
+              fontSize: '14px',
+              textTransform: 'none',
+              borderRadius: '8px',
+                
+            }}
+            >
+              Agregar semana del curso
           </Button>
-          )}
+        )}
+      </Grid>
       {courseState
-  .filter((content) => userRole === 'admin' || content.is_enabled)
-  .map((content) => (
-    <Accordion key={content.id} sx={{ mb: 2 }}>
+      .filter((content) => userRole === 'admin' || content.is_enabled)
+      .map((content) => (
+      <Accordion key={content.id} sx={{ mb: 3 }}>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ color: 'white' }} />}
-        sx={{ backgroundColor: '#E93845', color: 'white' }}
-      >
-        <Typography>{content.semana}</Typography>
-        {userRole === 'admin' && (
-          <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
-            <Button
-                          
-                          onClick={() => handleEditWeek(content)} 
+        sx={{ backgroundColor: '#E93845', color: 'white',  }}
+      > 
+        <Grid sx={{width:'100%',display:'flex',justifyContent:'space-between',  }}>
+          <Typography>{content.semana}</Typography>
+          {userRole === 'admin' && (
+            <Box sx={{ display: 'flex', gap: 1, ml: 2 }}>
+              <Button
+                            
+                            onClick={() => handleEditWeek(content)} 
+                              style={{
+                                  backgroundColor: 'rgb(33, 150, 243, 0.5)',
+                                  color: 'white',
+                                  borderRadius: '10px',
+                                  height: '2.5rem',
+                                  width: '20%',
+                                  marginBottom: '0.5rem',
+                                  '&:hover': {
+                                    backgroundColor: 'green',
+                                    opacity: 0.5,
+                                  },
+                                  fontSize: { lg: '12px', sm: '12px', md: '12px', xs: '9px' }
+                                  
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(33, 150, 243)'}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(33, 150, 243, 0.5)'}
+                          >
+                              <img src={editar} alt="editar curso" style={{ height: '1.5rem', width: '1.5rem' }} />
+              </Button>
+              <Button
+                            onClick={() => handleDeleteWeek(content.id)} 
                             style={{
-                                marginRight:'5px',
-                                backgroundColor: 'rgb(33, 150, 243, 0.5)',
-                                color: 'white',
-                                borderRadius: '10px',
-                                padding: '8px 16px',
-                                textDecoration: 'none',
-                                fontSize: '13px',
-                                transition: 'background-color 0.3s ease',
-                                
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(33, 150, 243)'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(33, 150, 243, 0.5)'}
-                        >
-                            <img src={editar} alt="editar curso" style={{ height: '1.5rem', width: '1.5rem' }} />
-                        </Button>
-            <Button
-                          onClick={() => handleDeleteWeek(content.id)} 
-                          style={{
-                              marginRight:'10px',
-                              backgroundColor: 'rgb(255,0,0,0.5)',
+                              backgroundColor: 'red',
                               color: 'white',
                               borderRadius: '10px',
-                              padding: '8px 16px',
-                              textDecoration: 'none',
-                              fontSize: '13px',
-                          }}
-                          
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,0,0)'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,0,0,0.5)'}
-                      >
-                          Eliminar
-                      </Button>
-            <Button
-              onClick={() => handleToggleWeekStatus(content.id, content.is_enabled)}
-              sx={{ color: 'white' }}
-            >
-              {content.is_enabled ? 'Deshabilitar' : 'Habilitar'}
-            </Button>
-          </Box>
-        )}
+                              height: '2.5rem',
+                              width: '20%',
+                              '&:hover': {
+                                backgroundColor: 'red',
+                                opacity: 0.5,
+                              },
+                              fontSize: { lg: '12px', sm: '12px', md: '12px', xs: '9px' }
+                            }}
+                            
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,0,0)'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,0,0,0.5)'}
+                        >
+                            <img src={basura} alt="Eliminar curso" style={{ height: '1.5rem', width: '1.5rem' }} />
+              </Button>
+              <Button
+                onClick={() => handleToggleWeekStatus(content.id, content.is_enabled)}
+                sx={{ 
+                  backgroundColor: content.is_enabled ? 'green' : 'gray',
+                  color: 'white',
+                  borderRadius: '10px',
+                  height: '2.5rem',
+                  width: '20%',
+                  marginBottom: '0.5rem',
+                  '&:hover': {
+                    backgroundColor: content.is_enabled ? 'darkgreen' : 'darkgray',
+                    opacity: 0.8,
+                  }, 
+                  fontSize: { lg: '12px', sm: '12px', md: '12px', xs: '9px' }
+                }}
+              >
+                {content.is_enabled ? <img src={habilitar} alt="habilitar" style={{ height: '1.5rem', width: '1.5rem' }} /> : <img src={desabilitar} alt="desabilitar" style={{ height: '1.5rem', width: '1.5rem' }} />}
+              </Button>
+            </Box>
+          )}
+        </Grid>
       </AccordionSummary>
       <AccordionDetails sx={{ backgroundColor: '#f4f4f4', color: 'black' }}>
       {userRole === 'admin' && (
@@ -460,83 +517,84 @@ const handleRestoreZoom = () => {
                 <Divider sx={{ borderColor: 'black', my: 0.5 }} />
               </React.Fragment>
             ))}
-          </AccordionDetails>
-        </Accordion>
+      </AccordionDetails>
+      </Accordion>
       ))}
       
       
       {/* Modal for previewing files */}
-      <Modal open={previewOpen} onClose={() => setPreviewOpen(false)}>
+       {/* Modal for previewing files */}
+       <Modal open={previewOpen} onClose={() => setPreviewOpen(false)}>
+  <Box
+    id="preview-modal"
+    sx={{
+      width: isFullscreen ? '100%' : '80%',
+      height: isFullscreen ? '100%' : '80%',
+      position: isFullscreen ? 'fixed' : 'relative',
+      top: isFullscreen ? 0 : '50%',
+      left: isFullscreen ? 0 : '50%',
+      transform: isFullscreen ? 'none' : 'translate(-50%, -50%)',
+      overflow: 'hidden',
+      backgroundColor: 'white',
+    }}
+  >
+    {/* Controles de pantalla completa y zoom */}
     <Box
-      id="preview-modal"
       sx={{
-        ...modalStyle,
-        width: '80%',
-        height: '80%',
-        position: 'relative',
-        overflow: 'hidden', // Evita que el contenido se desborde
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        zIndex: 1000,
+        display: 'flex',
+        gap: 1,
       }}
     >
-      {/* Controles de pantalla completa y zoom */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 10,
-          right: 10,
-          zIndex: 1000,
-          display: 'flex',
-          gap: 1,
-        }}
-      >
-        <IconButton onClick={handleZoomIn} color="primary">
-          <ZoomInIcon />
-        </IconButton>
-        <IconButton onClick={handleZoomOut} color="primary">
-          <ZoomOutIcon />
-        </IconButton>
-        <IconButton onClick={handleRestoreZoom} color="primary">
-          <RestoreIcon />
-        </IconButton>
-        <IconButton onClick={handleFullscreenToggle} color="primary">
-          {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
-        </IconButton>
-      </Box>
-
-      {/* Contenido escalable */}
-      <Box
-        sx={{
-          transform: `scale(${zoomLevel})`, // Aplicar nivel de zoom
-          transformOrigin: 'center', // Escalar desde el centro
-          width: '100%',
-          height: '100%',
-          overflow: 'auto', // Scroll si es necesario
-        }}
-      >
-        {previewFile?.fileName.endsWith('.pdf') ? (
-          <Worker workerUrl="/pdf.worker.min.js">
-            <Viewer fileUrl={`data:application/pdf;base64,${previewFile?.fileContent}`} />
-          </Worker>
-        ) : (
-          <Box
-            dangerouslySetInnerHTML={{ __html: docxContent }}
-            style={{
-              overflowY: 'auto',
-              height: '100%',
-            }}
-          />
-        )}
-      </Box>
-
-      {/* Botón para cerrar */}
-      <Button
-        variant="contained"
-        onClick={() => setPreviewOpen(false)}
-        sx={{ position: 'absolute', bottom: 10, right: 10 }}
-      >
-        Cerrar Vista Previa
-      </Button>
+      <IconButton onClick={handleZoomIn} color="primary" disabled={zoomLevel >= MAX_ZOOM}>
+        <ZoomInIcon />
+      </IconButton>
+      <IconButton onClick={handleRestoreZoom} color="primary">
+        <RestoreIcon />
+      </IconButton>
+      <IconButton onClick={handleFullscreenToggle} color="primary">
+        {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+      </IconButton>
     </Box>
-  </Modal>
+
+    {/* Indicador de nivel de zoom */}
+    <Box
+      sx={{
+        position: 'absolute',
+        bottom: 10,
+        left: 10,
+        zIndex: 1000,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        color: 'white',
+        padding: '5px 10px',
+        borderRadius: '5px',
+      }}
+    >
+      <Typography variant="body2">{Math.round(zoomLevel * 100)}%</Typography>
+    </Box>
+
+    {/* Contenido del PDF */}
+    <Worker workerUrl="/pdf.worker.min.js">
+      <Viewer
+        key={`${zoomLevel}-${isFullscreen}`} // Forzar re-renderizado
+        fileUrl={`data:application/pdf;base64,${previewFile?.fileContent}`}
+        scale={zoomLevel} // Escalado dinámico
+      />
+    </Worker>
+
+    {/* Botón para cerrar */}
+    <Button
+      variant="contained"
+      onClick={() => setPreviewOpen(false)}
+      sx={{ position: 'absolute', bottom: 10, right: 10 }}
+    >
+      Cerrar Vista Previa
+    </Button>
+  </Box>
+</Modal>
 
       {/* Modal for editing week name */}
       <Modal

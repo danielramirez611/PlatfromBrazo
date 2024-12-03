@@ -183,8 +183,8 @@ const ArduinoLab: React.FC = () => {
 
     return (
         <Grid container sx={{ width: '100%', height: '100vh', overflow: 'auto', color: 'white', justifyContent: 'center' }} spacing={2}>
-            <Grid item xs={12} md={5} sx={{ width: '100%', height: { xs: '50vh', md: '105%' }, overflow: 'hidden', boxSizing: 'border-box', marginTop: { xs: '12%', md: '0' } }}>
-                <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
+            <Grid item xs={12} md={12} sx={{ width: {xs:'100%', md:'94%'}, height:'100%' , overflow: 'auto', whiteSpace: 'nowrap', boxSizing: 'border-box', marginTop: { xs: '15%', md: '0' }, marginLeft:{xs:'0%', md:'6%'} }}>
+                <div style={{ width: '100%', height: '100%', position: 'relative'}}>
                     {isLoading && (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                             <CircularProgress />
@@ -218,78 +218,12 @@ const ArduinoLab: React.FC = () => {
                     />
                 </div>
             </Grid>
-
-            <Grid item xs={12} md={5}>
-
-                <Grid sx={{ textAlign: 'center', marginTop: '20px' }}>
-                    <Typography variant="h6" sx={{ color: 'white' }}>
-                        Usando el puerto: {getCurrentPort()}
-                    </Typography>
-                </Grid>
-
-                <Grid sx={{ padding: '10px', overflowY: 'auto', marginTop: '20px' }}>
-                    <FormControl fullWidth sx={{ marginBottom: '16px' }}>
-                        <InputLabel sx={{ color: '#fff' }}>Seleccionar Título del Código</InputLabel>
-                        <Select
-                            value={selectedCode ? selectedCode.id : ''}
-                            onChange={handleSelectChange}
-                            sx={{ backgroundColor: '#333', color: '#fff' }}
-                        >
-                            {codes.map(code => (
-                                <MenuItem key={code.id} value={code.id}>
-                                    {code.title}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-
-                    <Grid>
-                        <div style={{ position: 'relative' }}>
-                            <pre style={{
-                                backgroundColor: '#272822',
-                                color: '#f8f8f2',
-                                padding: '10px',
-                                borderRadius: '5px',
-                                fontFamily: 'Courier, monospace',
-                                fontSize: '12px',
-                                lineHeight: '1.5',
-                                overflowX: 'auto',
-                                whiteSpace: 'pre-wrap',  // Ajuste del texto para pantallas pequeñas
-                                wordBreak: 'break-word',  // Permitir que las líneas se rompan
-                                boxSizing: 'border-box',
-                                position: 'relative',
-                                maxWidth: '100%',         // Asegurar que el bloque no se desborde en pantallas pequeñas
-                            }}>
-                                {selectedCode ? selectedCode.code : 'Selecciona un código para verlo aquí'}
-                            </pre>
-
-                            {selectedCode && (
-                                <Button variant="contained" onClick={handleCopy} style={{
-                                    position: 'absolute',
-                                    top: '10px',            // Ajustar posición del botón
-                                    right: '10px',          // Espacio desde el borde derecho
-                                    backgroundColor: '#333', // Fondo del botón para que resalte
-                                    color: '#fff',           // Texto blanco para buen contraste
-                                    borderRadius: '5px',     // Bordes redondeados
-                                    padding: '5px 10px',     // Tamaño del botón más grande
-                                    fontSize: '12px',        // Tamaño de fuente ajustado
-                                    boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',  // Sombra para destacar el botón
-                                    zIndex: 10,              // Asegurar que esté superpuesto al contenido
-                                    textTransform: 'none',   // No usar mayúsculas
-                                }}>
-                                    {copied ? '¡Copiado!' : 'Copiar código'}
-                                </Button>
-                            )}
-
-                        </div>
-                    </Grid>
-                    {/*<Grid container sx={{ width: '100%', height: '100vh', overflow: 'auto', color: 'white', justifyContent: 'center' }} spacing={2}>
-      <Grid item xs={12} md={6}>
-        <ArduinoFileTable />
-      </Grid>
-    </Grid>*/}
-                </Grid>
+            <Grid sx={{ textAlign: 'center', marginTop: '20px', position:'absolute', top:'0', zIndex:'2' }}>
+                                <Typography variant="h6" sx={{ color: 'white' }}>
+                                    Usando el puerto: {getCurrentPort()}
+                                </Typography>
             </Grid>
+
         </Grid>
     );
 };

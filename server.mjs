@@ -167,7 +167,7 @@ let activePorts = {};  // Aquí almacenaremos los puertos asignados a cada usuar
 // Función para obtener puertos de Docker
 const getDockerPorts = () => {
   return new Promise((resolve, reject) => {
-      exec('docker ps --filter "name=mi_proyecto_docker" --format "{{.Ports}}"', (error, stdout) => {
+      exec('docker ps --filter "name=cncjs-docker" --format "{{.Ports}}"', (error, stdout) => {
           if (error) {
               return reject(error);
           }
@@ -247,7 +247,7 @@ app.get('/my-ips', (req, res) => {
     });
   }
 
-  exec('sudo docker ps --filter "name=mi_proyecto_docker" --format "{{.Ports}}"', (error, stdout) => {
+  exec('sudo docker ps --filter "name=cncjs-docker" --format "{{.Ports}}"', (error, stdout) => {
     if (error) {
       console.error(`Error ejecutando docker ps: ${error}`);
       return res.status(500).json({ error: 'Error al obtener los puertos de Docker' });
